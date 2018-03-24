@@ -19,7 +19,7 @@
 #include <SteamWorks>
 
 
-#define DATA "0.1"
+#define DATA "0.2"
 
 Handle kv;
 char sConfig[PLATFORM_MAX_PATH];
@@ -43,7 +43,10 @@ public void OnPluginStart()
 public Action Command_Translate(int client, int args)
 {
 	if(args < 1)
+	{
+		ReplyToCommand(client, "Use sm_translate <phrase to translate>");
 		return Plugin_Handled;
+	}
 		
 
 	char buffer[255];
@@ -54,7 +57,7 @@ public Action Command_Translate(int client, int args)
 	
 	if (kv == null)
 	{
-		PrintToChat(client, "You need to set first the file target with sm_translate_txt <filetarget> command.");
+		ReplyToCommand(client, "You need to set first the file target with sm_translate_txt <filetarget> command.");
 		return Plugin_Handled;
 	}
 	
@@ -68,14 +71,17 @@ public Action Command_Translate(int client, int args)
 		SteamWorks_SendHTTPRequest(request);
 	}
 	
-	PrintToChatAll("Working on translations...");
+	ReplyToCommand(client, "Working on translations...");
 	return Plugin_Handled;
 }
 
 public Action Command_TranslateTxt(int client, int args)
 {
 	if(args != 1)
+	{
+		ReplyToCommand(client, "Use sm_translate_txt <file target>");
 		return Plugin_Handled;
+	}
 		
 	char sLangFile[64];
 		
@@ -96,7 +102,7 @@ public Action Command_TranslateTxt(int client, int args)
 		FileToKeyValues(kv, sConfig);
 	}	
 	
-	PrintToChatAll("File set to %s",sConfig);
+	ReplyToCommand(client, "File set to %s",sConfig);
 	
 	return Plugin_Handled;
 }
