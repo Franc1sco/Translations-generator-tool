@@ -19,7 +19,7 @@
 #include <SteamWorks>
 
 
-#define DATA "0.2"
+#define DATA "0.3"
 
 Handle kv;
 char sConfig[PLATFORM_MAX_PATH];
@@ -47,7 +47,6 @@ public Action Command_Translate(int client, int args)
 		ReplyToCommand(client, "Use sm_translate <phrase to translate>");
 		return Plugin_Handled;
 	}
-		
 
 	char buffer[255];
 	GetCmdArgString(buffer,sizeof(buffer));
@@ -67,6 +66,10 @@ public Action Command_Translate(int client, int args)
 	for (new i = 0; i < maxLangs; i++)
 	{
 		GetLanguageInfo(i, temp, 3);
+		
+		if (StrEqual(temp, "cz", false) || StrEqual(temp, "jp", false) || StrEqual(temp, "ch", false) || StrEqual(temp, "ua", false))
+			continue; // unsupported languages
+		
 		Handle request = CreateRequest(buffer, temp);
 		SteamWorks_SendHTTPRequest(request);
 	}
@@ -141,8 +144,8 @@ public int Callback_OnHTTPResponse(Handle request, bool bFailure, bool bRequestS
 	ReadPackString(datapack, target, 3);
 	ReadPackString(datapack, input, 255);
 	CloseHandle(datapack);
-
-
+	
+	KvRewind(kv);
 	KvJumpToKey(kv, input, true);
 	KvSetString(kv, target, result);
 
@@ -150,14 +153,15 @@ public int Callback_OnHTTPResponse(Handle request, bool bFailure, bool bRequestS
 	if (timers != null)KillTimer(timers);
 	
 	timers = CreateTimer(4.0, Timer_WriteData);
-	
-	KvRewind(kv);
 }  
 
 public Action Timer_WriteData(Handle timer)
 {
-	if(kv != null) KeyValuesToFile(kv, sConfig);
-	
+	if(kv != null) 
+	{
+		KvRewind(kv);
+		KeyValuesToFile(kv, sConfig);
+	}
 	timers = null;
 	
 	PrintToChatAll("Translations done");
