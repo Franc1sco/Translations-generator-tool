@@ -19,7 +19,7 @@
 #include <SteamWorks>
 
 
-#define DATA "0.3"
+#define DATA "0.4"
 
 Handle kv;
 char sConfig[PLATFORM_MAX_PATH];
@@ -128,8 +128,9 @@ Handle CreateRequest(char[] input, char[] target)
 public int Callback_OnHTTPResponse(Handle request, bool bFailure, bool bRequestSuccessful, EHTTPStatusCode eStatusCode, Handle datapack)
 {
 	if (!bRequestSuccessful || eStatusCode != k_EHTTPStatusCode200OK)
-	{        
-        return;
+	{      
+		CloseHandle(datapack);		
+		return;
 	}
 
 	int iBufferSize;
